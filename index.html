@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bun & Bite | Menu</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#f7f5f0;
+  color:#222;
+  font-family:Arial,sans-serif;
+}
+header{
+  background:#191919;
+  color:white;
+  text-align:center;
+  padding:35px 15px;
+}
+header h1{
+  font-family:Georgia,serif;
+  font-size:40px;
+  margin:12px;
+}
+header p{color:#ccc}
+main{
+  max-width:650px;
+  margin:auto;
+  padding:20px 16px 100px;
+}
+.tabs{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  margin:20px 0;
+}
+.tabs button{
+  border:0;
+  border-radius:25px;
+  padding:12px 18px;
+  background:white;
+  color:#222;
+  white-space:nowrap;
+}
+.tabs button.active{
+  background:#191919;
+  color:white;
+}
+.item{
+  display:flex;
+  gap:14px;
+  background:white;
+  padding:14px;
+  margin:12px 0;
+  border-radius:15px;
+  align-items:center;
+}
+.emoji{font-size:38px}
+.info{flex:1}
+.info h3{margin:0 0 6px}
+.info p{
+  font-size:13px;
+  color:#777;
+  margin:5px 0 9px;
+}
+.price{font-weight:bold}
+.add{
+  background:#c65d36;
+  color:white;
+  border:0;
+  padding:10px 13px;
+  border-radius:20px;
+}
+.cart{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#191919;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.cart button{
+  background:#e7b69e;
+  border:0;
+  padding:12px 18px;
+  border-radius:25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div> A NEIGHBOURHOOD KITCHEN </div>
+  <h1>Bun & Bite</h1>
+  <p>Fresh comfort food · Made with care</p>
+</header>
+
+<main>
+  <p>Welcome! Choose your favourites.</p>
+
+  <div class="tabs">
+    <button class="active" onclick="show('Burgers',this)">Burgers</button>
+    <button onclick="show('Sides',this)">Sides</button>
+    <button onclick="show('Drinks',this)">Drinks</button>
+  </div>
+
+  <div id="menu"></div>
+</main>
+
+<div class="cart">
+  <div>
+    <b id="count">0 items</b><br>
+    <span id="total">EGP 0</span>
+  </div>
+  <button onclick="order()">View order</button>
+</div>
+
+<script>
+const data = {
+  Burgers:[
+    ["Classic Smash","Double beef, cheddar and house sauce",185,"🍔"],
+    ["Crispy Chicken","Crunchy chicken and spicy mayo",165,"🍗"],
+    ["Mushroom Swiss","Beef, mushrooms and Swiss cheese",195,"🍔"]
+  ],
+  Sides:[
+    ["Loaded Fries","Fries with cheese sauce",95,"🍟"],
+    ["Chicken Bites","Six crispy chicken bites",120,"🍗"],
+    ["Onion Rings","Golden crispy onion rings",75,"🧅"]
+  ],
+  Drinks:[
+    ["Fresh Lemonade","Fresh lemon and mint",65,"🍋"],
+    ["Iced Tea","Chilled tea with lemon",55,"🥤"],
+    ["Water","Bottled water",25,"💧"]
+  ]
+};
+
+let basket={};
+
+function show(category,button){
+  document.querySelectorAll(".tabs button")
+    .forEach(b=>b.classList.remove("active"));
+
+  button.classList.add("active");
+
+  document.getElementById("menu").innerHTML=
+    "<h2>"+category+"</h2>"+
+    data[category].map((x,i)=>`
+      <div class="item">
+        <div class="emoji">${x[3]}</div>
+        <div class="info">
+          <h3>${x[0]}</h3>
+          <p>${x[1]}</p>
+          <span class="price">EGP ${x[2]}</span>
+        </div>
+        <button class="add"
+          onclick="add('${category}',${i})">
+          Add +
+        </button>
+      </div>
+    `).join("");
+}
+
+function add(category,index){
+  let name=data[category][index][0];
+  basket[name]=(basket[name]||0)+1;
+  update();
+}
+
+function update(){
+  let count=0;
+  let total=0;
+
+  Object.keys(basket).forEach(name=>{
+    let item=Object.values(data).flat()
+      .find(x=>x[0]===name);
+
+    count+=basket[name];
+    total+=basket[name]*item[2];
+  });
+
+  document.getElementById("count").textContent=
+    count+" items";
+
+  document.getElementById("total").textContent=
+    "EGP "+total;
+}
+
+function order(){
+  let lines=Object.entries(basket)
+    .map(([name,q])=>q+" x "+name);
+
+  alert(
+    lines.length
+    ? lines.join("\n")+"\n\n"+
+      document.getElementById("total").textContent
+    : "Your basket is empty"
+  );
+}
+
+show("Burgers",document.querySelector(".tabs button"));
+</script>
+
+</body>
+</html>
